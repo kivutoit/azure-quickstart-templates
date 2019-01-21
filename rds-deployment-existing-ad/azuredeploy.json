@@ -13,35 +13,35 @@
             "metadata": {
                 "description": "The name of the AD domain. For example contoso.com"
             },
-            "defaultValue": "contoso.com"
+            "defaultValue": "ad.onthehub.com"
         },
         "adVnetName": {
             "type": "string",
             "metadata": {
                 "description": "The vnet name of AD domain. For example johnvnet1"
             },
-            "defaultValue": "AD-VNET"
+            "defaultValue": "e5Vnet"
         },
         "adVnetRG": {
             "type": "string",
             "metadata": {
                 "description": "The Resource Group containing the existing Virtual Network resource"
             },
-            "defaultValue": "AD-VNET-RG"
+            "defaultValue": "e5Prod"
         },
         "adSubnetName": {
             "type": "string",
             "metadata": {
                 "description": "The subnet name of AD domain. For example johnsubnet1"
             },
-            "defaultValue": "AD-VNET-SUBNET"
+            "defaultValue": "Subnet230"
         },
         "adminUsername": {
             "type": "string",
             "metadata": {
                 "description": "The name of the administrator of the new VM and the domain. Exclusion list: 'administrator'. For example johnadmin"
             },
-            "defaultValue": "vmadmin"
+            "defaultValue": "kvt-admin"
         },
         "adminPassword": {
             "type": "securestring",
@@ -87,7 +87,7 @@
             "metadata": {
                 "description": "The size of the RDSH VMs"
             },
-            "defaultValue": "Standard_A4_v2"
+            "defaultValue": "Standard_A2_v2"
         },
         "location": {
             "type": "string",
@@ -150,7 +150,7 @@
             "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/availabilitySets",
             "location": "[parameters('location')]",
-            "name": "gw-availabilityset",
+            "name": "RDGateway-AS",
             "properties": {
                 "PlatformUpdateDomainCount": 20,
                 "PlatformFaultDomainCount": 2
@@ -159,32 +159,7 @@
                 "name": "Aligned"
             }
         },
-        {
-            "apiVersion": "2017-03-30",
-            "type": "Microsoft.Compute/availabilitySets",
-            "location": "[parameters('location')]",
-            "name": "cb-availabilityset",
-            "properties": {
-                "PlatformUpdateDomainCount": 20,
-                "PlatformFaultDomainCount": 2
-            },
-            "sku": {
-                "name": "Aligned"
-            }
-        },
-        {
-            "apiVersion": "2017-03-30",
-            "type": "Microsoft.Compute/availabilitySets",
-            "location": "[parameters('location')]",
-            "name": "rdsh-availabilityset",
-            "properties": {
-                "PlatformUpdateDomainCount": 20,
-                "PlatformFaultDomainCount": 2
-            },
-            "sku": {
-                "name": "Aligned"
-            }
-        },
+  
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/loadBalancers",
@@ -196,7 +171,7 @@
             "properties": {
                 "frontendIPConfigurations": [
                     {
-                        "name": "LBFE",
+                        "name": "RD-LBFE",
                         "properties": {
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpRef'))]"
@@ -206,7 +181,7 @@
                 ],
                 "backendAddressPools": [
                     {
-                        "name": "LBBAP"
+                        "name": "RD-LBBAP"
                     }
                 ],
                 "loadBalancingRules": [
@@ -290,7 +265,7 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "gw-nic",
+            "name": "RDGateway-nic",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "Microsoft.Network/loadBalancers/loadBalancer"
@@ -330,7 +305,7 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "cb-nic",
+            "name": "",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "Microsoft.Network/loadBalancers/loadBalancer"
@@ -391,21 +366,21 @@
         {
             "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "gw-vm",
+            "name": "RDGateway",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/availabilitySets', 'gw-availabilityset')]",
-                "Microsoft.Network/networkInterfaces/gw-nic"
+                "Microsoft.Network/networkInterfaces/RDGateway-nic"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "Standard_A2"
+                    "vmSize": "Standard_A2_v2"
                 },
                 "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'gw-availabilityset')]"
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]"
                 },
                 "osProfile": {
-                    "computerName": "gateway",
+                    "computerName": "RDGateway",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
@@ -417,7 +392,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "gw_OSDisk",
+                        "name": "RDGateway_OSDisk",
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
                         "managedDisk": {
@@ -428,7 +403,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces','gw-nic')]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces','RDGateway-nic')]"
                         }
                     ]
                 }
@@ -437,10 +412,10 @@
                 {
                     "apiVersion": "2015-06-15",
                     "type": "Microsoft.Compute/virtualMachines/extensions",
-                    "name": "gw-vm/gateway",
+                    "name": "RDGateway/gateway",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Compute/virtualMachines', 'gw-vm')]"
+                        "[resourceId('Microsoft.Compute/virtualMachines', 'RDGateway')]"
                     ],
                     "properties": {
                         "publisher": "Microsoft.Powershell",
@@ -477,7 +452,7 @@
                 "count": "[parameters('numberOfRdshInstances')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/availabilitySets', 'rdsh-availabilityset')]",
+                "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]",
                 "[concat('Microsoft.Network/networkInterfaces/', 'rdsh-', copyindex(), '-nic')]"
             ],
             "properties": {
@@ -485,7 +460,7 @@
                     "vmSize": "[parameters('rdshVmSize')]"
                 },
                 "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'rdsh-availabilityset')]"
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]"
                 },
                 "osProfile": {
                     "computerName": "[concat('rdsh-', copyIndex())]",
@@ -553,19 +528,19 @@
         {
             "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "cb-vm",
+            "name": "RDBroker",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/availabilitySets', 'cb-availabilityset')]",
-                "Microsoft.Network/networkInterfaces/cb-nic",
+                "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]",
+                "Microsoft.Network/networkInterfaces/RDBroker-nic",
                 "rdsh-vm-loop"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "Standard_A2"
+                    "vmSize": "Standard_A2_v2"
                 },
                 "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'cb-availabilityset')]"
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]"
                 },
                 "osProfile": {
                     "computerName": "broker",
@@ -580,7 +555,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "cb_OSDisk",
+                        "name": "RDBroker_OSDisk",
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
                         "managedDisk": {
@@ -591,7 +566,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces','cb-nic')]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces','RDBroker-nic')]"
                         }
                     ]
                 }
@@ -599,11 +574,11 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "cb-vm/rdsdeployment",
+            "name": "RDBroker/rdsdeployment",
             "apiVersion": "2015-06-15",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', 'cb-vm')]",
+                "[resourceId('Microsoft.Compute/virtualMachines', 'RDBroker')]",
                 "Microsoft.Compute/virtualMachines/gw-vm/extensions/gateway",
                 "rdsh-vm-loop"
             ],
@@ -625,7 +600,7 @@
                         "externalfqdn": "[reference(variables('gatewayIpRef')).dnsSettings.fqdn]",
                         "numberOfRdshInstances": "[parameters('numberOfRdshInstances')]",
                         "sessionHostNamingPrefix": "rdsh-",
-                        "webAccessServer": "[concat('gateway.',parameters('adDomainName'))]"
+                        "webAccessServer": "[concat('RDGateway.',parameters('adDomainName'))]"
                     }
                 },
                 "protectedSettings": {
