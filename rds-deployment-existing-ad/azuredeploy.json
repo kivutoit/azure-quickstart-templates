@@ -104,9 +104,9 @@
         "imageOffer": "WindowsServer",
         "dnsServerPrivateIp": "10.0.0.4",
         "subnet-id": "[concat(resourceId(parameters('adVnetRG'),'Microsoft.Network/virtualNetworks',parameters('adVnetName')),'/subnets/',parameters('adSubnetName'))]",
-        "publicIpRef": "publicIp",
-        "brokerIpRef": "brokerpublicIp",
-        "gatewayIpRef": "gatewaypublicIp",
+        "publicIpRef": "RDLBpublicIp",
+        "brokerIpRef": "RDBrokerpublicIp",
+        "gatewayIpRef": "RDGatewaypublicIp",
         "assetLocation": "https://raw.githubusercontent.com/Azure/azure-QuickStart-Templates/master/rds-deployment/"
     },
     "resources": [
@@ -317,7 +317,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('brokerIpRef'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('RDBrokerIpRef'))]"
                             },
                             "subnet": {
                                 "id": "[variables('subnet-id')]"
@@ -369,7 +369,7 @@
             "name": "RDGateway",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/availabilitySets', 'gw-availabilityset')]",
+                "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]",
                 "Microsoft.Network/networkInterfaces/RDGateway-nic"
             ],
             "properties": {
