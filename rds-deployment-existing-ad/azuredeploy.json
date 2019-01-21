@@ -113,7 +113,7 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('publicIpRef')]",
+            "name": "[variables('RDLBpublicIpRef')]",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
@@ -125,7 +125,7 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('gatewayIpRef')]",
+            "name": "[variables('RDGatewayIpRef')]",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
@@ -137,7 +137,7 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('brokerIpRef')]",
+            "name": "[variables('RDBrokerIpRef')]",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
@@ -166,7 +166,7 @@
             "name": "loadBalancer",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/',variables('publicIpRef'))]"
+                "[concat('Microsoft.Network/publicIPAddresses/',variables('RDLBpublicIpRef'))]"
             ],
             "properties": {
                 "frontendIPConfigurations": [
@@ -174,7 +174,7 @@
                         "name": "RD-LBFE",
                         "properties": {
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpRef'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('RDLBpublicIpRef'))]"
                             }
                         }
                     }
