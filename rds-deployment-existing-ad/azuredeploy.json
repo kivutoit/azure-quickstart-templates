@@ -305,7 +305,7 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "",
+            "name": "RDLB-nic",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "Microsoft.Network/loadBalancers/loadBalancer"
