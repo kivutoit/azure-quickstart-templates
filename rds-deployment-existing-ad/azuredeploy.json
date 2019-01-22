@@ -108,7 +108,7 @@
         "RDLBpublicIpRef": "RDLBpublicIp",
         "RDbrokerIpRef": "RDBrokerpublicIp",
         "RDgatewayIpRef": "RDGatewaypublicIp",
-        "assetLocation": "https://raw.githubusercontent.com/Azure/azure-QuickStart-Templates/master/rds-deployment/"
+        "assetLocation": "https://raw.githubusercontent.com/kivutoit/azure-quickstart-templates/master/rds-deployment-existing-ad/"
     },
     "resources": [
         {
