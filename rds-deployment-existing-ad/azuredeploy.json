@@ -82,7 +82,8 @@
                 "Standard_D2_v2",
                 "Standard_D3_v2",
                 "Standard_D4_v2",
-                "Standard_D5_v2"
+                "Standard_D5_v2",
+                "Standard_B2MS"
             ],
             "type": "String",
             "metadata": {
@@ -205,10 +206,10 @@
                         "name": "LBRule02",
                         "properties": {
                             "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadbalancer'),'/frontendIPConfigurations/LBFE')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadbalancer'),'/frontendIPConfigurations/RD_LBFE')]"
                             },
                             "backendAddressPool": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadbalancer'),'/backendAddressPools/LBBAP')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadbalancer'),'/backendAddressPools/RD-LBBAP')]"
                             },
                             "protocol": "Udp",
                             "frontendPort": 3391,
@@ -247,7 +248,7 @@
                         "name": "rdp",
                         "properties": {
                             "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadBalancer'),'/frontendIPConfigurations/LBFE')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadBalancer'),'/frontendIPConfigurations/RD-LBFE')]"
                             },
                             "protocol": "tcp",
                             "frontendPort": 3389,
@@ -280,7 +281,7 @@
                             },
                             "loadBalancerBackendAddressPools": [
                                 {
-                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadBalancer'),'/backendAddressPools/LBBAP')]"
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadBalancer'),'/backendAddressPools/RD-LBBAP')]"
                                 }
                             ],
                             "loadBalancerInboundNatRules": [
