@@ -3,73 +3,73 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "dnsLabelPrefix": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Unique public DNS prefix for the deployment. The fqdn will look something like '<dnsname>.westus.cloudapp.azure.com'. Up to 62 chars, digits or dashes, lowercase, should start with a letter: must conform to '^[a-z][a-z0-9-]{1,61}[a-z0-9]$'. For example johndns1 will result the final RDWEB access url like https://johndns1.westus.cloudapp.azure.com/RDWeb"
             }
         },
         "adDomainName": {
-            "type": "string",
+            "defaultValue": "ad.onthehub.com",
+            "type": "String",
             "metadata": {
                 "description": "The name of the AD domain. For example contoso.com"
-            },
-            "defaultValue": "ad.onthehub.com"
+            }
         },
         "adVnetName": {
-            "type": "string",
+            "defaultValue": "e5Vnet",
+            "type": "String",
             "metadata": {
                 "description": "The vnet name of AD domain. For example johnvnet1"
-            },
-            "defaultValue": "e5Vnet"
+            }
         },
         "adVnetRG": {
-            "type": "string",
+            "defaultValue": "e5Prod",
+            "type": "String",
             "metadata": {
                 "description": "The Resource Group containing the existing Virtual Network resource"
-            },
-            "defaultValue": "e5Prod"
+            }
         },
         "adSubnetName": {
-            "type": "string",
+            "defaultValue": "Subnet230",
+            "type": "String",
             "metadata": {
                 "description": "The subnet name of AD domain. For example johnsubnet1"
-            },
-            "defaultValue": "Subnet230"
+            }
         },
         "adminUsername": {
-            "type": "string",
+            "defaultValue": "kvt-admin",
+            "type": "String",
             "metadata": {
                 "description": "The name of the administrator of the new VM and the domain. Exclusion list: 'administrator'. For example johnadmin"
-            },
-            "defaultValue": "kvt-admin"
+            }
         },
         "adminPassword": {
-            "type": "securestring",
+            "defaultValue": "",
+            "type": "SecureString",
             "metadata": {
                 "description": "The password for the administrator account of the new VM and the domain"
-            },
-            "defaultValue": ""
+            }
         },
         "imageSKU": {
-            "type": "string",
+            "defaultValue": "2016-Datacenter",
             "allowedValues": [
                 "2012-R2-Datacenter",
                 "2016-Datacenter"
             ],
+            "type": "String",
             "metadata": {
                 "description": "Windows server SKU"
-            },
-            "defaultValue": "2016-Datacenter"
+            }
         },
         "numberOfRdshInstances": {
-            "type": "int",
             "defaultValue": 1,
+            "type": "Int",
             "metadata": {
                 "description": "Number of RemoteDesktopSessionHosts"
             }
         },
         "rdshVmSize": {
-            "type": "string",
+            "defaultValue": "Standard_B2MS",
             "allowedValues": [
                 "Standard_A1_v2",
                 "Standard_A2_v2",
@@ -84,14 +84,14 @@
                 "Standard_D4_v2",
                 "Standard_D5_v2"
             ],
+            "type": "String",
             "metadata": {
                 "description": "The size of the RDSH VMs"
-            },
-            "defaultValue": "Standard_B2MS"
+            }
         },
         "location": {
-            "type": "string",
             "defaultValue": "[resourceGroup().location]",
+            "type": "String",
             "metadata": {
                 "description": "Location for all resources."
             }
@@ -104,16 +104,16 @@
         "imageOffer": "WindowsServer",
         "dnsServerPrivateIp": "10.0.0.4",
         "subnet-id": "[concat(resourceId(parameters('adVnetRG'),'Microsoft.Network/virtualNetworks',parameters('adVnetName')),'/subnets/',parameters('adSubnetName'))]",
-        "publicIpRef": "RDLBpublicIp",
-        "brokerIpRef": "RDBrokerpublicIp",
-        "gatewayIpRef": "RDGatewaypublicIp",
-        "assetLocation": "https://raw.githubusercontent.com/kivutoit/azure-QuickStart-Templates/master/rds-deployment/"
+        "RDLBpublicIpRef": "RDLBpublicIp",
+        "RDbrokerIpRef": "RDBrokerpublicIp",
+        "RDgatewayIpRef": "RDGatewaypublicIp",
+        "assetLocation": "https://raw.githubusercontent.com/Azure/azure-QuickStart-Templates/master/rds-deployment/"
     },
     "resources": [
         {
-            "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('RDLBpublicIpRef')]",
+            "apiVersion": "2015-06-15",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
@@ -123,9 +123,9 @@
             }
         },
         {
-            "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('RDGatewayIpRef')]",
+            "apiVersion": "2015-06-15",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
@@ -135,9 +135,9 @@
             }
         },
         {
-            "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('RDBrokerIpRef')]",
+            "apiVersion": "2015-06-15",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
@@ -147,27 +147,23 @@
             }
         },
         {
-            "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/availabilitySets",
-            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Aligned"
+            },
             "name": "RDGateway-AS",
+            "apiVersion": "2017-03-30",
+            "location": "[parameters('location')]",
             "properties": {
                 "PlatformUpdateDomainCount": 20,
                 "PlatformFaultDomainCount": 2
-            },
-            "sku": {
-                "name": "Aligned"
             }
         },
-  
         {
-            "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/loadBalancers",
             "name": "loadBalancer",
+            "apiVersion": "2015-06-15",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/',variables('RDLBpublicIpRef'))]"
-            ],
             "properties": {
                 "frontendIPConfigurations": [
                     {
@@ -189,10 +185,10 @@
                         "name": "LBRule01",
                         "properties": {
                             "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadbalancer'),'/frontendIPConfigurations/LBFE')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadbalancer'),'/frontendIPConfigurations/RD-LBFE')]"
                             },
                             "backendAddressPool": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadbalancer'),'/backendAddressPools/LBBAP')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadbalancer'),'/backendAddressPools/RD-LBBAP')]"
                             },
                             "protocol": "Tcp",
                             "frontendPort": 443,
@@ -260,16 +256,16 @@
                         }
                     }
                 ]
-            }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/',variables('RDLBpublicIpRef'))]"
+            ]
         },
         {
-            "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "RDGateway-nic",
+            "apiVersion": "2015-06-15",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "Microsoft.Network/loadBalancers/loadBalancer"
-            ],
             "properties": {
                 "ipConfigurations": [
                     {
@@ -277,7 +273,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gatewayIpRef'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('RDgatewayIpRef'))]"
                             },
                             "subnet": {
                                 "id": "[variables('subnet-id')]"
@@ -300,16 +296,16 @@
                         "[variables('dnsServerPrivateIp')]"
                     ]
                 }
-            }
-        },
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "RDLB-nic",
-            "location": "[parameters('location')]",
+            },
             "dependsOn": [
                 "Microsoft.Network/loadBalancers/loadBalancer"
-            ],
+            ]
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "RDBroker-nic",
+            "apiVersion": "2015-06-15",
+            "location": "[parameters('location')]",
             "properties": {
                 "ipConfigurations": [
                     {
@@ -330,20 +326,20 @@
                         "[variables('dnsServerPrivateIp')]"
                     ]
                 }
-            }
+            },
+            "dependsOn": [
+                "Microsoft.Network/loadBalancers/loadBalancer"
+            ]
         },
         {
-            "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat('rdsh-', copyindex(), '-nic')]",
+            "apiVersion": "2015-06-15",
             "location": "[parameters('location')]",
             "copy": {
                 "name": "rdsh-nic-loop",
                 "count": "[parameters('numberOfRdshInstances')]"
             },
-            "dependsOn": [
-                "Microsoft.Network/loadBalancers/loadBalancer"
-            ],
             "properties": {
                 "ipConfigurations": [
                     {
@@ -361,17 +357,16 @@
                         "[variables('dnsServerPrivateIp')]"
                     ]
                 }
-            }
+            },
+            "dependsOn": [
+                "Microsoft.Network/loadBalancers/loadBalancer"
+            ]
         },
         {
-            "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "RDGateway",
+            "apiVersion": "2017-03-30",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]",
-                "Microsoft.Network/networkInterfaces/RDGateway-nic"
-            ],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "Standard_A2_v2"
@@ -410,13 +405,10 @@
             },
             "resources": [
                 {
-                    "apiVersion": "2015-06-15",
                     "type": "Microsoft.Compute/virtualMachines/extensions",
                     "name": "RDGateway/gateway",
+                    "apiVersion": "2015-06-15",
                     "location": "[parameters('location')]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Compute/virtualMachines', 'RDGateway')]"
-                    ],
                     "properties": {
                         "publisher": "Microsoft.Powershell",
                         "type": "DSC",
@@ -438,23 +430,26 @@
                                 "AdminPassword": "[parameters('adminPassword')]"
                             }
                         }
-                    }
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', 'RDGateway')]"
+                    ]
                 }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]",
+                "Microsoft.Network/networkInterfaces/RDGateway-nic"
             ]
         },
         {
-            "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[concat('rdsh-', copyindex())]",
+            "apiVersion": "2017-03-30",
             "location": "[parameters('location')]",
             "copy": {
                 "name": "rdsh-vm-loop",
                 "count": "[parameters('numberOfRdshInstances')]"
             },
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]",
-                "[concat('Microsoft.Network/networkInterfaces/', 'rdsh-', copyindex(), '-nic')]"
-            ],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('rdshVmSize')]"
@@ -493,13 +488,10 @@
             },
             "resources": [
                 {
-                    "apiVersion": "2015-06-15",
                     "type": "Microsoft.Compute/virtualMachines/extensions",
                     "name": "[concat('rdsh-', copyindex(),'/sessionhost')]",
+                    "apiVersion": "2015-06-15",
                     "location": "[parameters('location')]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Compute/virtualMachines', concat('rdsh-', copyindex()))]"
-                    ],
                     "properties": {
                         "publisher": "Microsoft.Powershell",
                         "type": "DSC",
@@ -521,20 +513,22 @@
                                 "AdminPassword": "[parameters('adminPassword')]"
                             }
                         }
-                    }
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', concat('rdsh-', copyindex()))]"
+                    ]
                 }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'rdsh-', copyindex(), '-nic')]"
             ]
         },
         {
-            "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "RDBroker",
+            "apiVersion": "2017-03-30",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]",
-                "Microsoft.Network/networkInterfaces/RDBroker-nic",
-                "rdsh-vm-loop"
-            ],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "Standard_A2_v2"
@@ -570,18 +564,18 @@
                         }
                     ]
                 }
-            }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/availabilitySets', 'RDGateway-AS')]",
+                "Microsoft.Network/networkInterfaces/RDBroker-nic",
+                "rdsh-vm-loop"
+            ]
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "RDBroker/rdsdeployment",
             "apiVersion": "2015-06-15",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', 'RDBroker')]",
-                "Microsoft.Compute/virtualMachines/gw-vm/extensions/gateway",
-                "rdsh-vm-loop"
-            ],
             "properties": {
                 "publisher": "Microsoft.Powershell",
                 "type": "DSC",
@@ -597,7 +591,7 @@
                         },
                         "connectionBroker": "[concat('broker.',parameters('adDomainName'))]",
                         "domainName": "[parameters('adDomainName')]",
-                        "externalfqdn": "[reference(variables('gatewayIpRef')).dnsSettings.fqdn]",
+                        "externalfqdn": "[reference(variables('RDgatewayIpRef')).dnsSettings.fqdn]",
                         "numberOfRdshInstances": "[parameters('numberOfRdshInstances')]",
                         "sessionHostNamingPrefix": "rdsh-",
                         "webAccessServer": "[concat('RDGateway.',parameters('adDomainName'))]"
@@ -608,7 +602,12 @@
                         "adminPassword": "[parameters('adminPassword')]"
                     }
                 }
-            }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', 'RDBroker')]",
+                "Microsoft.Compute/virtualMachines/RDGateway/extensions/gateway",
+                "rdsh-vm-loop"
+            ]
         }
     ]
 }
